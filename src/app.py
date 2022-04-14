@@ -20,6 +20,27 @@ def index():
 def pageNotFound(error):
     return "<h1>La pagina que intentas buscar no existe...</h1>",404
 
+def changePublicFilesVisibility(userFiles):
+
+    cursor = db.cursor()
+
+    for userFile in userFiles:
+        try:
+            updatedUserFile = userFile
+            if (userFile['file_visibility'] == "Public"):
+                updatedUserFile['file_visibility'] = "Private"
+                sql = """UPDATE User_Drive SET id_file={0}, file_name='{1}', file_extension='{2}', file_owner='{3}', file_visibility='{4}', file_lastModified='{5}' WHERE id_file = {0}""".format(
+                updatedUserFile['file_id'],updatedUserFile['file_name'], updatedUserFile['file_extension'], updatedUserFile['file_owner'], updatedUserFile['file_visibility'], updatedUserFile['file_lastModified'])
+                cursor.execute(sql)
+                db.commit()
+                sendEmail(userFile['fileOwner'])
+        except Exception as ex:
+            return "Error"
+
+
+def sendEmail(fileOwner):
+    print("Email sended to ", fileOwner)
+
 
 @app.route('/getUserFiles',methods=['GET'])
 def getUserFiles():
@@ -32,6 +53,7 @@ def getUserFiles():
         for item in datos:
             userFile = {"id_file":item[0],"file_name":item[1],"file_extension":item[2], "file_owner":item[3], "file_visibility":item[4],"file_lastModified":item[5]}
             user_files.append(userFile)
+        changePublicFilesVisibility(user_files)
         return jsonify({"userFiles":user_files, "message":"User files showed"})
     except Exception as ex:
         return jsonify({"message":"Error"})
@@ -86,7 +108,6 @@ def updateUserFile(idFile):
         sql = """UPDATE User_Drive SET id_file={0}, file_name='{1}', file_extension='{2}', file_owner='{3}', file_visibility='{4}', file_lastModified='{5}' WHERE id_file = {6}""".format(
             idFile,updatedUserFile['file_name'], updatedUserFile['file_extension'], updatedUserFile['file_owner'], updatedUserFile['file_visibility'], updatedUserFile['file_lastModified'],idFile
         )
-        print(sql)
         cursor.execute(sql)
         db.commit() ##Confirmo la accion de insertar un nuevo archivo
         return jsonify({"message":"User file updated"})
