@@ -35,6 +35,24 @@ def getUserFiles():
     except Exception as ex:
         return jsonify({"message":"Error"})
 
+@app.route('/getUserFile/<idFile>', methods=['GET'])
+def getUserFile(idFile):
+    try:
+        cursor = db.cursor()
+        sql = "SELECT * FROM User_Drive WHERE id_file = '{0}'".format(idFile)
+        cursor.execute(sql)
+        data = cursor.fetchone()
+        if data != None:
+            userFile = {"id_file":data[0],"file_name":data[1],"file_extension":data[2], "file_owner":data[3], "file_visibility":data[4],"file_lastModified":data[5]}
+            return jsonify({"userFile":userFile, "message":"User file found"})
+        else:
+            return jsonify({"message":"User file can't be found"})
+
+    except Exception as ex:
+        return jsonify({"message":"Error"})
+
+
+
 
 if __name__ == '__main__':
     app.register_error_handler(404, pageNotFound)
