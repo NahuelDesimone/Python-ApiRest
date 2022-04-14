@@ -1,6 +1,7 @@
 from crypt import methods
-from flask import Flask,jsonify
+from flask import Flask,jsonify, request
 from flaskext.mysql import MySQL
+from datetime import datetime
 import pymysql
 
 db = pymysql.connect(
@@ -17,7 +18,7 @@ def index():
     return "Hola mundo probando"
 
 def pageNotFound(error):
-    return "<h1>La pagina que intentas buscar no existe...</h1>"
+    return "<h1>La pagina que intentas buscar no existe...</h1>",404
 
 
 @app.route('/getUserFiles',methods=['GET'])
@@ -51,6 +52,20 @@ def getUserFile(idFile):
     except Exception as ex:
         return jsonify({"message":"Error"})
 
+@app.route('/userFile',methods=['POST'])
+def newUserFile():
+    try:
+        newUserFile = request.json
+        cursor = db.cursor()
+        sql = """INSERT INTO User_Drive (id_file,file_name,file_extension,file_owner,file_visibility,file_lastModified) VALUES ({0},'{1}','{2}','{3}','{4}','{5}')""".format(newUserFile['id_file'],
+        newUserFile['file_name'], newUserFile['file_extension'],
+        newUserFile['file_owner'], newUserFile['file_visibility'],newUserFile['file_lastModified'])
+        cursor.execute(sql)
+        db.commit() ##Confirmo la accion de insertar un nuevo archivo
+        return jsonify({"message":"User file created"})
+
+    except Exception as ex:
+        return jsonify({"message":"Error"})
 
 
 
