@@ -52,7 +52,7 @@ def getUserFile(idFile):
     except Exception as ex:
         return jsonify({"message":"Error"})
 
-@app.route('/userFile',methods=['POST'])
+@app.route('/newUserFile',methods=['POST'])
 def newUserFile():
     try:
         newUserFile = request.json
@@ -67,7 +67,32 @@ def newUserFile():
     except Exception as ex:
         return jsonify({"message":"Error"})
 
+@app.route('/deleteUserFile/<idFile>',methods=['DELETE'])
+def deleteUserFile(idFile):
+    try:
+        cursor = db.cursor()
+        sql = "DELETE FROM User_Drive WHERE id_file = '{0}'".format(idFile)
+        cursor.execute(sql)
+        return jsonify({"message":"User file deleted"})
 
+    except Exception as ex:
+        return jsonify({"message":"Error"})
+
+@app.route('/updateUserFile/<idFile>',methods=['PUT'])
+def updateUserFile(idFile):
+    try:
+        updatedUserFile = request.json
+        cursor = db.cursor()
+        sql = """UPDATE User_Drive SET id_file={0}, file_name='{1}', file_extension='{2}', file_owner='{3}', file_visibility='{4}', file_lastModified='{5}' WHERE id_file = {6}""".format(
+            idFile,updatedUserFile['file_name'], updatedUserFile['file_extension'], updatedUserFile['file_owner'], updatedUserFile['file_visibility'], updatedUserFile['file_lastModified'],idFile
+        )
+        print(sql)
+        cursor.execute(sql)
+        db.commit() ##Confirmo la accion de insertar un nuevo archivo
+        return jsonify({"message":"User file updated"})
+
+    except Exception as ex:
+        return jsonify({"message":"Error"}) 
 
 if __name__ == '__main__':
     app.register_error_handler(404, pageNotFound)
