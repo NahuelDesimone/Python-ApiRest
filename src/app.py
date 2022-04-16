@@ -1,13 +1,16 @@
 from crypt import methods
+import json
 from flask import Flask,jsonify, render_template, request
 from flaskext.mysql import MySQL
 from datetime import datetime
 import pymysql
 
-db = pymysql.connect(
+def connectDatabase():
+    return pymysql.connect(
     host='localhost',
     user='root',
-    password='12345678'
+    password='12345678',
+    database='google_drive'
 )
 
 app =Flask(__name__)
@@ -75,7 +78,22 @@ def getUserFile(idFile):
 @app.route('/newUserFile',methods=['POST'])
 def newUserFile():
     try:
-        newUserFile = request.json
+        id_file = request.form["id_file"]
+        file_name = request.form["file_name"]
+        file_extension = request.form["file_extension"]
+        file_owner = request.form["file_owner"]
+        file_visibility = request.form["file_visibility"]
+        file_lastModified = request.form["file_lastModified"]
+        newUserFile = {
+            "id_file": int(id_file),
+            "file_name": file_name,
+            "file_extension": file_extension,
+            "file_owner": file_owner,
+            "file_visibility": file_visibility,
+            "file_lastModified": file_lastModified
+        }
+        print(newUserFile)
+        db = connectDatabase()
         cursor = db.cursor()
         sql = """INSERT INTO User_Drive (id_file,file_name,file_extension,file_owner,file_visibility,file_lastModified) VALUES ({0},'{1}','{2}','{3}','{4}','{5}')""".format(newUserFile['id_file'],
         newUserFile['file_name'], newUserFile['file_extension'],
@@ -87,8 +105,8 @@ def newUserFile():
     except Exception as ex:
         return jsonify({"message":"Error"})
 
-@app.route('/newDatabase',methods=['POST'])
-def newDatabase():
+@app.route('/panel',methods=['POST'])
+def panel():
     try:
         db = pymysql.connect(
         host='localhost',
@@ -107,7 +125,6 @@ def newDatabase():
 `file_lastModified` DATETIME NOT NULL,
 PRIMARY KEY (`id_file`),
 UNIQUE INDEX `id_file_UNIQUE` (`id_file` ASC) VISIBLE);"""
-        print(sqlCreateTable)
         cursor.execute(sqlCreateTable)
         return render_template('panel.html')
 

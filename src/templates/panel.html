@@ -11,6 +11,38 @@
     <h2>La base de datos se creo correctamente</h2>
 
     <h3>Las opciones a realizar son: </h3>
+
+    <button>Listar todos los archivos de drive</button>
+
+    <button>Cambiar la visibilidad</button>
+
+    <hr>
+
+    <h4> Ingrese los datos del archivo a crear: </h4>
+    <form action="/newUserFile" method="POST">
+
+        <label for="id_file">ID Archivo: </label>
+        <input type="number" placeholder="ID Archivo" name="id_file"><br>
+
+        <label for="file_name">Nombre del archivo: </label>
+        <input type="text" placeholder="Nombre del archivo" name="file_name"><br>
+
+        <label for="file_extension">Extension del archivo: </label>
+        <input type="text" placeholder="Extension del archivo" name="file_extension"><br>
+
+        <label for="file_owner">Propietario del archivo: </label>
+        <input type="text" placeholder="Propietario del archivo" name="file_owner"><br>
+
+        <label for="file_visibility">Visibilidad del archivo: </label>
+        <input type="text" placeholder="Visibilidad del archivo" name="file_visibility"><br>
+
+        <label for="file_lastModified">Ultima modificacion del archivo: </label>
+        <input type="date" placeholder="Ultima modificacion del archivo" name="file_lastModified"><br>
+
+        <button type="submit">Crear archivo</button>
+
+    </form>
+
     
 </body>
 </html>
