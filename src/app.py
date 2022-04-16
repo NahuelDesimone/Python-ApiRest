@@ -3,6 +3,7 @@ import json
 from flask import Flask,jsonify, render_template, request
 from flaskext.mysql import MySQL
 from datetime import datetime
+from numpy import datetime64
 import pymysql
 
 def connectDatabase():
@@ -22,23 +23,30 @@ def index():
 def pageNotFound(error):
     return render_template('pageNotFound.html'),404
 
-# def changePublicFilesVisibility(userFiles):
+@app.route('/changePublicFilesVisibility', methods=['POST'])
+def changePublicFilesVisibility():
 
-#     cursor = db.cursor()
+    try:
+        acum = 0
+        db = connectDatabase()
+        cursor = db.cursor()
+        jsonUserFiles = getUserFiles().json
+        for usrFile in jsonUserFiles['userFiles']:
+            updatedUserFile = usrFile
+            if (usrFile['file_visibility'] == "Public"):
+                updatedUserFile['file_visibility'] = "Private"
+                print(type(updatedUserFile['file_lastModified']))
+                sql = """UPDATE User_Drive SET id_file={0}, file_name='{1}', file_extension='{2}', file_owner='{3}', file_visibility='{4}', file_lastModified='{5}' WHERE id_file = {0}""".format(
+                updatedUserFile['id_file'],updatedUserFile['file_name'], updatedUserFile['file_extension'], updatedUserFile['file_owner'], updatedUserFile['file_visibility'], updatedUserFile['file_lastModified'])
+                print(sql)
+                cursor.execute(sql)
+                db.commit()
+                acum = acum + 1
 
-#     for userFile in userFiles:
-#         try:
-#             updatedUserFile = userFile
-#             if (userFile['file_visibility'] == "Public"):
-#                 updatedUserFile['file_visibility'] = "Private"
-#                 sql = """UPDATE User_Drive SET id_file={0}, file_name='{1}', file_extension='{2}', file_owner='{3}', file_visibility='{4}', file_lastModified='{5}' WHERE id_file = {0}""".format(
-#                 updatedUserFile['file_id'],updatedUserFile['file_name'], updatedUserFile['file_extension'], updatedUserFile['file_owner'], updatedUserFile['file_visibility'], updatedUserFile['file_lastModified'])
-#                 cursor.execute(sql)
-#                 db.commit()
-#                 sendEmail(userFile['fileOwner'])
-#         except Exception as ex:
-#             return "Error"
+        return "Se modifico la visibilidad de {0} archivos que eran publicos".format(acum)
 
+    except Exception as ex:
+        return "Error"
 
 def sendEmail(fileOwner):
     print("Email sended to ", fileOwner)

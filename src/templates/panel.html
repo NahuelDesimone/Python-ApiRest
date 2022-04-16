@@ -15,9 +15,10 @@
         <button type="submit">Listar todos los archivos de drive</button>
     </form>
 
-    <button>Cambiar la visibilidad</button>
-
-    <hr>
+    <form action="/changePublicFilesVisibility" method="POST">
+        <button type="submit">Cambiar la visibilidad</button>
+    </form>
+    
 
     <h4> Ingrese los datos del archivo a crear: </h4>
     <form action="/newUserFile" method="POST">
