@@ -48,6 +48,7 @@ def sendEmail(fileOwner):
 def getUserFiles():
     try:
         sql = "SELECT * from User_Drive"
+        db = connectDatabase()
         cursor = db.cursor()
         cursor.execute(sql)
         datos=cursor.fetchall()
