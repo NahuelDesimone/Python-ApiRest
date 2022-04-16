@@ -7,8 +7,7 @@ import pymysql
 db = pymysql.connect(
     host='localhost',
     user='root',
-    password='12345678',
-    db='google_drive'
+    password='12345678'
 )
 
 app =Flask(__name__)
@@ -97,12 +96,23 @@ def newDatabase():
         password='12345678'
         )
         cursor = db.cursor()
-        sqlCreateDB = "CREATE SCHEMA `google_drive`;"
+        sqlCreateDB = "CREATE SCHEMA `google_drive` ;"
         cursor.execute(sqlCreateDB)
-        return "DB created succesfully"
+        sqlCreateTable = """CREATE TABLE `google_drive`.`User_Drive` (
+`id_file` INT NOT NULL,
+`file_name` VARCHAR(45) NOT NULL,
+`file_extension` VARCHAR(6) NULL,
+`file_owner` VARCHAR(45) NOT NULL,
+`file_visibility` VARCHAR(10) NOT NULL,
+`file_lastModified` DATETIME NOT NULL,
+PRIMARY KEY (`id_file`),
+UNIQUE INDEX `id_file_UNIQUE` (`id_file` ASC) VISIBLE);"""
+        print(sqlCreateTable)
+        cursor.execute(sqlCreateTable)
+        return render_template('panel.html')
 
     except Exception as ex:
-        return "Error"
+        return "<h3>Error al crear la base de datos</h3>"
 
 
 @app.route('/deleteUserFile/<idFile>',methods=['DELETE'])
