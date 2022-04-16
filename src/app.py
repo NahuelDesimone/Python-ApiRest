@@ -88,6 +88,23 @@ def newUserFile():
     except Exception as ex:
         return jsonify({"message":"Error"})
 
+@app.route('/newDatabase',methods=['POST'])
+def newDatabase():
+    try:
+        db = pymysql.connect(
+        host='localhost',
+        user='root',
+        password='12345678'
+        )
+        cursor = db.cursor()
+        sqlCreateDB = "CREATE SCHEMA `google_drive`;"
+        cursor.execute(sqlCreateDB)
+        return "DB created succesfully"
+
+    except Exception as ex:
+        return "Error"
+
+
 @app.route('/deleteUserFile/<idFile>',methods=['DELETE'])
 def deleteUserFile(idFile):
     try:
