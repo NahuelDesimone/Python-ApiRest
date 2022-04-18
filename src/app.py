@@ -2,7 +2,7 @@ from crypt import methods
 import json
 from flask import Flask,jsonify, render_template, request
 from flaskext.mysql import MySQL
-from datetime import datetime
+from datetime import datetime, date
 from numpy import datetime64
 import pymysql
 
@@ -35,9 +35,10 @@ def changePublicFilesVisibility():
             updatedUserFile = usrFile
             if (usrFile['file_visibility'] == "Public"):
                 updatedUserFile['file_visibility'] = "Private"
-                print(type(updatedUserFile['file_lastModified']))
+                dateTimeFormat = datetime.strptime(updatedUserFile['file_lastModified'], "%a, %d %b %Y %H:%M:%S %Z")
+                updatedLastModified = dateTimeFormat.date()
                 sql = """UPDATE User_Drive SET id_file={0}, file_name='{1}', file_extension='{2}', file_owner='{3}', file_visibility='{4}', file_lastModified='{5}' WHERE id_file = {0}""".format(
-                updatedUserFile['id_file'],updatedUserFile['file_name'], updatedUserFile['file_extension'], updatedUserFile['file_owner'], updatedUserFile['file_visibility'], updatedUserFile['file_lastModified'])
+                updatedUserFile['id_file'],updatedUserFile['file_name'], updatedUserFile['file_extension'], updatedUserFile['file_owner'], updatedUserFile['file_visibility'], updatedLastModified)
                 print(sql)
                 cursor.execute(sql)
                 db.commit()
@@ -131,7 +132,7 @@ def panel():
 `file_extension` VARCHAR(6) NULL,
 `file_owner` VARCHAR(45) NOT NULL,
 `file_visibility` VARCHAR(10) NOT NULL,
-`file_lastModified` DATETIME NOT NULL,
+`file_lastModified` DATE NOT NULL,
 PRIMARY KEY (`id_file`),
 UNIQUE INDEX `id_file_UNIQUE` (`id_file` ASC) VISIBLE);"""
         cursor.execute(sqlCreateTable)
