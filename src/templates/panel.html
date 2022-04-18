@@ -45,6 +45,31 @@
 
     </form>
 
+    <h4> Ingrese los datos del archivo a modificar: </h4>
+    <form action="/updateUserFile" method="PUT">
+
+        <label for="id_file">ID Archivo: </label>
+        <input type="number" placeholder="ID Archivo" name="id_file"><br>
+
+        <label for="file_name">Nombre del archivo: </label>
+        <input type="text" placeholder="Nombre del archivo" name="file_name"><br>
+
+        <label for="file_extension">Extension del archivo: </label>
+        <input type="text" placeholder="Extension del archivo" name="file_extension"><br>
+
+        <label for="file_owner">Propietario del archivo: </label>
+        <input type="text" placeholder="Propietario del archivo" name="file_owner"><br>
+
+        <label for="file_visibility">Visibilidad del archivo: </label>
+        <input type="text" placeholder="Visibilidad del archivo" name="file_visibility"><br>
+
+        <label for="file_lastModified">Ultima modificacion del archivo: </label>
+        <input type="date" placeholder="Ultima modificacion del archivo" name="file_lastModified"><br>
+
+        <button type="submit">Modificar archivo</button>
+
+    </form>
+
     
 </body>
 </html>

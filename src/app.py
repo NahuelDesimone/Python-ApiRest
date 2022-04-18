@@ -78,18 +78,19 @@ def getUserFiles():
 @app.route('/getUserFile/<idFile>', methods=['GET'])
 def getUserFile(idFile):
     try:
+        db = connectDatabase()
         cursor = db.cursor()
         sql = "SELECT * FROM User_Drive WHERE id_file = '{0}'".format(idFile)
         cursor.execute(sql)
         data = cursor.fetchone()
         if data != None:
             userFile = {"id_file":data[0],"file_name":data[1],"file_extension":data[2], "file_owner":data[3], "file_visibility":data[4],"file_lastModified":data[5]}
-            return jsonify({"userFile":userFile, "message":"User file found"})
+            return userFile
         else:
-            return jsonify({"message":"User file can't be found"})
+            return None
 
     except Exception as ex:
-        return jsonify({"message":"Error"})
+        return ex
 
 @app.route('/newUserFile',methods=['POST'])
 def newUserFile():
@@ -108,15 +109,18 @@ def newUserFile():
             "file_visibility": file_visibility,
             "file_lastModified": file_lastModified
         }
-        print(newUserFile)
-        db = connectDatabase()
-        cursor = db.cursor()
-        sql = """INSERT INTO User_Drive (id_file,file_name,file_extension,file_owner,file_visibility,file_lastModified) VALUES ({0},'{1}','{2}','{3}','{4}','{5}')""".format(newUserFile['id_file'],
-        newUserFile['file_name'], newUserFile['file_extension'],
-        newUserFile['file_owner'], newUserFile['file_visibility'],newUserFile['file_lastModified'])
-        cursor.execute(sql)
-        db.commit() ##Confirmo la accion de insertar un nuevo archivo
-        return jsonify({"message":"User file created"})
+        userFileExists = getUserFile(id_file)
+        if (userFileExists == None):
+            db = connectDatabase()
+            cursor = db.cursor()
+            sql = """INSERT INTO User_Drive (id_file,file_name,file_extension,file_owner,file_visibility,file_lastModified) VALUES ({0},'{1}','{2}','{3}','{4}','{5}')""".format(newUserFile['id_file'],
+            newUserFile['file_name'], newUserFile['file_extension'],
+            newUserFile['file_owner'], newUserFile['file_visibility'],newUserFile['file_lastModified'])
+            cursor.execute(sql)
+            db.commit() ##Confirmo la accion de insertar un nuevo archivo
+            return jsonify({"message":"User file created"})
+        else:
+            return jsonify({"message": "Error, input user file already exists"})
 
     except Exception as ex:
         return jsonify({"message":"Error"})
@@ -159,16 +163,32 @@ def deleteUserFile(idFile):
     except Exception as ex:
         return jsonify({"message":"Error"})
 
-@app.route('/updateUserFile/<idFile>',methods=['PUT'])
-def updateUserFile(idFile):
+@app.route('/updateUserFile',methods=['PUT'])
+def updateUserFile():
     try:
-        updatedUserFile = request.json
-        cursor = db.cursor()
-        sql = """UPDATE User_Drive SET id_file={0}, file_name='{1}', file_extension='{2}', file_owner='{3}', file_visibility='{4}', file_lastModified='{5}' WHERE id_file = {6}""".format(
-            idFile,updatedUserFile['file_name'], updatedUserFile['file_extension'], updatedUserFile['file_owner'], updatedUserFile['file_visibility'], updatedUserFile['file_lastModified'],idFile
-        )
-        cursor.execute(sql)
-        db.commit() ##Confirmo la accion de insertar un nuevo archivo
+        id_file = request.form["id_file"]
+        fileToUpdate = getUserFile(id_file)
+        print(fileToUpdate)
+        # input_file_name = request.form["file_name"]
+        # input_file_extension = request.form["file_extension"]
+        # input_file_owner = request.form["file_owner"]
+        # input_file_visibility = request.form["file_visibility"]
+        # input_file_lastModified = request.form["file_lastModified"]
+        # updatedUserFile = {
+        #     "id_file": int(id_file),
+        #     "file_name": file_name,
+        #     "file_extension": file_extension,
+        #     "file_owner": file_owner,
+        #     "file_visibility": file_visibility,
+        #     "file_lastModified": file_lastModified
+        # }
+        # db = connectDatabase()
+        # cursor = db.cursor()
+        # sql = """UPDATE User_Drive SET id_file={0}, file_name='{1}', file_extension='{2}', file_owner='{3}', file_visibility='{4}', file_lastModified='{5}' WHERE id_file = {6}""".format(
+        #     idFile,updatedUserFile['file_name'], updatedUserFile['file_extension'], updatedUserFile['file_owner'], updatedUserFile['file_visibility'], updatedUserFile['file_lastModified'],idFile
+        # )
+        # cursor.execute(sql)
+        # db.commit() ##Confirmo la accion de insertar un nuevo archivo
         return jsonify({"message":"User file updated"})
 
     except Exception as ex:
