@@ -203,15 +203,12 @@ def updateUserFile(idFile):
 
                 for prop in propertiesToUpdate:
                     updatedUserFile[prop] = request.form[prop]
-                
-                print(updatedUserFile)
 
                 db = connectDatabase()
                 cursor = db.cursor()
                 sql = """UPDATE User_Drive SET id_file={0}, file_name='{1}', file_extension='{2}', file_owner='{3}', file_visibility='{4}', file_lastModified='{5}' WHERE id_file = {6}""".format(
                     id_file,updatedUserFile['file_name'], updatedUserFile['file_extension'], updatedUserFile['file_owner'], updatedUserFile['file_visibility'], updatedUserFile['file_lastModified'],id_file
                 )
-                print(sql)
                 cursor.execute(sql)
                 db.commit() ##Confirmo la accion de insertar un nuevo archivo
                 return jsonify({"message":"User file updated"})
