@@ -1,10 +1,10 @@
 from crypt import methods
 import json
 from flask import Flask,jsonify, render_template, request
-from flaskext.mysql import MySQL
 from datetime import datetime, date
-from numpy import datetime64
 import pymysql
+
+app =Flask(__name__)
 
 def connectDatabase():
     return pymysql.connect(
@@ -14,7 +14,6 @@ def connectDatabase():
     database='google_drive'
 )
 
-app =Flask(__name__)
 
 @app.route('/')
 def index():
@@ -222,6 +221,6 @@ def updateUserFile(idFile):
 
 if __name__ == '__main__':
     app.register_error_handler(404, pageNotFound)
-    app.run(debug=True) ## Le pongo el debug true para que refleje los cambios en tiempo real
+    app.run(debug=True, host='0.0.0.0', port=4000) ## Le pongo el debug true para que refleje los cambios en tiempo real
 
 
