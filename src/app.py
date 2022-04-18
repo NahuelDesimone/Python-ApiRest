@@ -176,43 +176,46 @@ def deleteUserFile(idFile):
     except Exception as ex:
         return jsonify({"message":"Error"})
 
-@app.route('/updateUserFile',methods=['POST'])
-def updateUserFile():
+@app.route('/updateUserFile/<idFile>',methods=['POST'])
+def updateUserFile(idFile):
     try:
         id_file = request.form["id_file"]
-        print(id_file)
-        # propertiesToUpdate = []
-        # if (id_file != None):
-        #     propertiesToUpdate.append(id_file)
-        #     userFileToUpdate = getUserFile(id_file)
-        #     input_file_name = request.form["file_name"]
-        #     if (input_file_name != None):
-        #         propertiesToUpdate.append(input_file_name)
-        #     input_file_extension = request.form["file_extension"]
-        #     if (input_file_extension != None):
-        #         propertiesToUpdate.append(input_file_extension)
-        #     input_file_owner = request.form["file_owner"]
-        #     if (input_file_owner != None):
-        #         propertiesToUpdate.append(input_file_owner)
-        #     input_file_visibility = request.form["file_visibility"]
-        #     if (input_file_visibility != None):
-        #         propertiesToUpdate.append(input_file_visibility)
-        #     input_file_lastModified = request.form["file_lastModified"]
-        #     if (input_file_lastModified != None):
-        #         propertiesToUpdate.append(input_file_lastModified)
+        if (id_file != None):
+            userFileToUpdate = getUserFile(id_file)
+            updatedUserFile = userFileToUpdate
+            propertiesToUpdate = []
+            input_file_name = request.form["file_name"]
+            if (input_file_name != ''):
+                propertiesToUpdate.append('file_name')
+            input_file_extension = request.form["file_extension"]
+            if (input_file_extension != ''):
+                propertiesToUpdate.append('file_extension')
+            input_file_owner = request.form["file_owner"]
+            if (input_file_owner != ''):
+                propertiesToUpdate.append('file_owner')
+            input_file_visibility = request.form["file_visibility"]
+            if (input_file_visibility != ''):
+                propertiesToUpdate.append('file_visibility')
+            input_file_lastModified = request.form["file_lastModified"]
+            if (input_file_lastModified != ''):
+                propertiesToUpdate.append('file_lastModified')
 
-        #     print("Props to update: ",propertiesToUpdate)
-        #     print("userFileToUpdate: ",userFileToUpdate)
+            for prop in propertiesToUpdate:
+                updatedUserFile[prop] = request.form[prop]
+            
+            print(updatedUserFile)
 
-        # db = connectDatabase()
-        # cursor = db.cursor()
-        # sql = """UPDATE User_Drive SET id_file={0}, file_name='{1}', file_extension='{2}', file_owner='{3}', file_visibility='{4}', file_lastModified='{5}' WHERE id_file = {6}""".format(
-        #     idFile,updatedUserFile['file_name'], updatedUserFile['file_extension'], updatedUserFile['file_owner'], updatedUserFile['file_visibility'], updatedUserFile['file_lastModified'],idFile
-        # )
-        # cursor.execute(sql)
-        # db.commit() ##Confirmo la accion de insertar un nuevo archivo
-        return jsonify({"message":"User file updated"})
-        # return jsonify({"message": "id_file must be input to update user file"})
+            db = connectDatabase()
+            cursor = db.cursor()
+            sql = """UPDATE User_Drive SET id_file={0}, file_name='{1}', file_extension='{2}', file_owner='{3}', file_visibility='{4}', file_lastModified='{5}' WHERE id_file = {6}""".format(
+                id_file,updatedUserFile['file_name'], updatedUserFile['file_extension'], updatedUserFile['file_owner'], updatedUserFile['file_visibility'], updatedUserFile['file_lastModified'],id_file
+            )
+            print(sql)
+            cursor.execute(sql)
+            db.commit() ##Confirmo la accion de insertar un nuevo archivo
+            return jsonify({"message":"User file updated"})
+
+        return jsonify({"message": "id_file must be input to update user file"})
 
     except Exception as ex:
         return jsonify({"message":"Error"}) 
