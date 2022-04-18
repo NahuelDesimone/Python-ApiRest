@@ -39,12 +39,18 @@ def changePublicFilesVisibility():
                 updatedLastModified = dateTimeFormat.date()
                 sql = """UPDATE User_Drive SET id_file={0}, file_name='{1}', file_extension='{2}', file_owner='{3}', file_visibility='{4}', file_lastModified='{5}' WHERE id_file = {0}""".format(
                 updatedUserFile['id_file'],updatedUserFile['file_name'], updatedUserFile['file_extension'], updatedUserFile['file_owner'], updatedUserFile['file_visibility'], updatedLastModified)
-                print(sql)
                 cursor.execute(sql)
                 db.commit()
+                sendEmail(updatedUserFile['file_owner'])
                 acum = acum + 1
+        
+        if (acum > 0):
+            return "Se modifico la visibilidad de {0} archivos que eran publicos".format(acum)
+        
+        else:
+            return "Todos los archivos del usuario son privados"
 
-        return "Se modifico la visibilidad de {0} archivos que eran publicos".format(acum)
+        
 
     except Exception as ex:
         return "Error"
