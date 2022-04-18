@@ -23,6 +23,43 @@ def index():
 def pageNotFound(error):
     return render_template('pageNotFound.html'),404
 
+publicUserFilesHistoric = []
+
+@app.route('/getUserFilesHistoric', methods=['GET'])
+def getUserFilesHistoric():
+    if (len(publicUserFilesHistoric) > 0):
+        return jsonify({"publicUserFilesHistoric": publicUserFilesHistoric})
+    else:
+        return jsonify({"message": "The user never have a public file"})
+
+
+@app.route('/panel',methods=['POST'])
+def panel():
+    try:
+        db = pymysql.connect(
+        host='localhost',
+        user='root',
+        password='12345678'
+        )
+        cursor = db.cursor()
+        sqlCreateDB = "CREATE SCHEMA `google_drive` ;"
+        cursor.execute(sqlCreateDB)
+        sqlCreateTable = """CREATE TABLE `google_drive`.`User_Drive` (
+`id_file` INT NOT NULL,
+`file_name` VARCHAR(45) NOT NULL,
+`file_extension` VARCHAR(6) NULL,
+`file_owner` VARCHAR(45) NOT NULL,
+`file_visibility` VARCHAR(10) NOT NULL,
+`file_lastModified` DATE NOT NULL,
+PRIMARY KEY (`id_file`),
+UNIQUE INDEX `id_file_UNIQUE` (`id_file` ASC) VISIBLE);"""
+        cursor.execute(sqlCreateTable)
+        return render_template('panel.html')
+
+    except Exception as ex:
+        return "<h3>Error al crear la base de datos</h3>"
+
+
 @app.route('/changePublicFilesVisibility', methods=['POST'])
 def changePublicFilesVisibility():
 
@@ -45,10 +82,10 @@ def changePublicFilesVisibility():
                 acum = acum + 1
         
         if (acum > 0):
-            return "Se modifico la visibilidad de {0} archivos que eran publicos".format(acum)
+            return jsonify({"message": "{0} user files updated file visibility from public to private".format(acum)})
         
         else:
-            return "Todos los archivos del usuario son privados"
+            return jsonify({"message": "All user files are private"})
 
         
 
@@ -118,38 +155,14 @@ def newUserFile():
             newUserFile['file_owner'], newUserFile['file_visibility'],newUserFile['file_lastModified'])
             cursor.execute(sql)
             db.commit() ##Confirmo la accion de insertar un nuevo archivo
+            if (newUserFile['file_visibility'] == "Public"):
+                publicUserFilesHistoric.append(newUserFile)
             return jsonify({"message":"User file created"})
         else:
             return jsonify({"message": "Error, input user file already exists"})
 
     except Exception as ex:
         return jsonify({"message":"Error"})
-
-@app.route('/panel',methods=['POST'])
-def panel():
-    try:
-        db = pymysql.connect(
-        host='localhost',
-        user='root',
-        password='12345678'
-        )
-        cursor = db.cursor()
-        sqlCreateDB = "CREATE SCHEMA `google_drive` ;"
-        cursor.execute(sqlCreateDB)
-        sqlCreateTable = """CREATE TABLE `google_drive`.`User_Drive` (
-`id_file` INT NOT NULL,
-`file_name` VARCHAR(45) NOT NULL,
-`file_extension` VARCHAR(6) NULL,
-`file_owner` VARCHAR(45) NOT NULL,
-`file_visibility` VARCHAR(10) NOT NULL,
-`file_lastModified` DATE NOT NULL,
-PRIMARY KEY (`id_file`),
-UNIQUE INDEX `id_file_UNIQUE` (`id_file` ASC) VISIBLE);"""
-        cursor.execute(sqlCreateTable)
-        return render_template('panel.html')
-
-    except Exception as ex:
-        return "<h3>Error al crear la base de datos</h3>"
 
 
 @app.route('/deleteUserFile/<idFile>',methods=['DELETE'])
@@ -163,25 +176,34 @@ def deleteUserFile(idFile):
     except Exception as ex:
         return jsonify({"message":"Error"})
 
-@app.route('/updateUserFile',methods=['PUT'])
+@app.route('/updateUserFile',methods=['POST'])
 def updateUserFile():
     try:
         id_file = request.form["id_file"]
-        fileToUpdate = getUserFile(id_file)
-        print(fileToUpdate)
-        # input_file_name = request.form["file_name"]
-        # input_file_extension = request.form["file_extension"]
-        # input_file_owner = request.form["file_owner"]
-        # input_file_visibility = request.form["file_visibility"]
-        # input_file_lastModified = request.form["file_lastModified"]
-        # updatedUserFile = {
-        #     "id_file": int(id_file),
-        #     "file_name": file_name,
-        #     "file_extension": file_extension,
-        #     "file_owner": file_owner,
-        #     "file_visibility": file_visibility,
-        #     "file_lastModified": file_lastModified
-        # }
+        print(id_file)
+        # propertiesToUpdate = []
+        # if (id_file != None):
+        #     propertiesToUpdate.append(id_file)
+        #     userFileToUpdate = getUserFile(id_file)
+        #     input_file_name = request.form["file_name"]
+        #     if (input_file_name != None):
+        #         propertiesToUpdate.append(input_file_name)
+        #     input_file_extension = request.form["file_extension"]
+        #     if (input_file_extension != None):
+        #         propertiesToUpdate.append(input_file_extension)
+        #     input_file_owner = request.form["file_owner"]
+        #     if (input_file_owner != None):
+        #         propertiesToUpdate.append(input_file_owner)
+        #     input_file_visibility = request.form["file_visibility"]
+        #     if (input_file_visibility != None):
+        #         propertiesToUpdate.append(input_file_visibility)
+        #     input_file_lastModified = request.form["file_lastModified"]
+        #     if (input_file_lastModified != None):
+        #         propertiesToUpdate.append(input_file_lastModified)
+
+        #     print("Props to update: ",propertiesToUpdate)
+        #     print("userFileToUpdate: ",userFileToUpdate)
+
         # db = connectDatabase()
         # cursor = db.cursor()
         # sql = """UPDATE User_Drive SET id_file={0}, file_name='{1}', file_extension='{2}', file_owner='{3}', file_visibility='{4}', file_lastModified='{5}' WHERE id_file = {6}""".format(
@@ -190,6 +212,7 @@ def updateUserFile():
         # cursor.execute(sql)
         # db.commit() ##Confirmo la accion de insertar un nuevo archivo
         return jsonify({"message":"User file updated"})
+        # return jsonify({"message": "id_file must be input to update user file"})
 
     except Exception as ex:
         return jsonify({"message":"Error"}) 
