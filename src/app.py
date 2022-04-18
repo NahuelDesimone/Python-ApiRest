@@ -182,38 +182,41 @@ def updateUserFile(idFile):
         id_file = request.form["id_file"]
         if (id_file != None):
             userFileToUpdate = getUserFile(id_file)
-            updatedUserFile = userFileToUpdate
-            propertiesToUpdate = []
-            input_file_name = request.form["file_name"]
-            if (input_file_name != ''):
-                propertiesToUpdate.append('file_name')
-            input_file_extension = request.form["file_extension"]
-            if (input_file_extension != ''):
-                propertiesToUpdate.append('file_extension')
-            input_file_owner = request.form["file_owner"]
-            if (input_file_owner != ''):
-                propertiesToUpdate.append('file_owner')
-            input_file_visibility = request.form["file_visibility"]
-            if (input_file_visibility != ''):
-                propertiesToUpdate.append('file_visibility')
-            input_file_lastModified = request.form["file_lastModified"]
-            if (input_file_lastModified != ''):
-                propertiesToUpdate.append('file_lastModified')
+            if (userFileToUpdate != None):
+                updatedUserFile = userFileToUpdate
+                propertiesToUpdate = []
+                input_file_name = request.form["file_name"]
+                if (input_file_name != ''):
+                    propertiesToUpdate.append('file_name')
+                input_file_extension = request.form["file_extension"]
+                if (input_file_extension != ''):
+                    propertiesToUpdate.append('file_extension')
+                input_file_owner = request.form["file_owner"]
+                if (input_file_owner != ''):
+                    propertiesToUpdate.append('file_owner')
+                input_file_visibility = request.form["file_visibility"]
+                if (input_file_visibility != ''):
+                    propertiesToUpdate.append('file_visibility')
+                input_file_lastModified = request.form["file_lastModified"]
+                if (input_file_lastModified != ''):
+                    propertiesToUpdate.append('file_lastModified')
 
-            for prop in propertiesToUpdate:
-                updatedUserFile[prop] = request.form[prop]
-            
-            print(updatedUserFile)
+                for prop in propertiesToUpdate:
+                    updatedUserFile[prop] = request.form[prop]
+                
+                print(updatedUserFile)
 
-            db = connectDatabase()
-            cursor = db.cursor()
-            sql = """UPDATE User_Drive SET id_file={0}, file_name='{1}', file_extension='{2}', file_owner='{3}', file_visibility='{4}', file_lastModified='{5}' WHERE id_file = {6}""".format(
-                id_file,updatedUserFile['file_name'], updatedUserFile['file_extension'], updatedUserFile['file_owner'], updatedUserFile['file_visibility'], updatedUserFile['file_lastModified'],id_file
-            )
-            print(sql)
-            cursor.execute(sql)
-            db.commit() ##Confirmo la accion de insertar un nuevo archivo
-            return jsonify({"message":"User file updated"})
+                db = connectDatabase()
+                cursor = db.cursor()
+                sql = """UPDATE User_Drive SET id_file={0}, file_name='{1}', file_extension='{2}', file_owner='{3}', file_visibility='{4}', file_lastModified='{5}' WHERE id_file = {6}""".format(
+                    id_file,updatedUserFile['file_name'], updatedUserFile['file_extension'], updatedUserFile['file_owner'], updatedUserFile['file_visibility'], updatedUserFile['file_lastModified'],id_file
+                )
+                print(sql)
+                cursor.execute(sql)
+                db.commit() ##Confirmo la accion de insertar un nuevo archivo
+                return jsonify({"message":"User file updated"})
+            else:
+                return jsonify({"message": "The user file with idFile {0} don't exists, please enter a valid idFile".format(id_file)})
 
         return jsonify({"message": "id_file must be input to update user file"})
 
