@@ -1,3 +1,4 @@
+from cmath import log
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
 
@@ -28,7 +29,14 @@ def uploadFile(filePath, parentFolderId):
     newFile.SetContentFile(filePath)
     newFile.Upload()
 
+def downloadFile(fileId, downloadPath):
+    credentials = login()
+    fileToDownload = credentials.CreateFile({'id': fileId})
+    fileName = fileToDownload['title']
+    fileToDownload.GetContentFile(downloadPath + fileName)
+
 
 if __name__ == "__main__":
     #createFile('HolaDrive.txt', "Contenido de archivo de prueba",'1pz-AG8QOp0HlXjqnoDmNO0s-tPUR1egG')
-    uploadFile('/Users/nahueldesimone/Downloads/English CV - Nahuel Desimone.pdf', '1pz-AG8QOp0HlXjqnoDmNO0s-tPUR1egG')
+    #uploadFile('/Users/nahueldesimone/Downloads/English CV - Nahuel Desimone.pdf', '1pz-AG8QOp0HlXjqnoDmNO0s-tPUR1egG')
+    downloadFile('1m__Qzi0wAI_sKPPNftB_F0XzPjWndvuW','/Users/nahueldesimone/Downloads/')
