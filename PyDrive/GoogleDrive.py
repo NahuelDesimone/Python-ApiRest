@@ -35,8 +35,22 @@ def downloadFile(fileId, downloadPath):
     fileName = fileToDownload['title']
     fileToDownload.GetContentFile(downloadPath + fileName)
 
+def getFiles(query):
+    result = []
+    credentials = login()
+    fileList = credentials.ListFile({'q': query}).GetList()
+    for file in fileList:
+        #ID File
+        print('ID Drive: ', file['id'])
+        print('Nombre del archivo: ', file['title'])
+        print('Extension del archivo', file['mimeType'])
+        print('Fecha de ultima modificacion', file['modifiedDate'])
+        result.append(file)
+    
+    return result
 
 if __name__ == "__main__":
     #createFile('HolaDrive.txt', "Contenido de archivo de prueba",'1pz-AG8QOp0HlXjqnoDmNO0s-tPUR1egG')
     #uploadFile('/Users/nahueldesimone/Downloads/English CV - Nahuel Desimone.pdf', '1pz-AG8QOp0HlXjqnoDmNO0s-tPUR1egG')
-    downloadFile('1m__Qzi0wAI_sKPPNftB_F0XzPjWndvuW','/Users/nahueldesimone/Downloads/')
+    #downloadFile('1m__Qzi0wAI_sKPPNftB_F0XzPjWndvuW','/Users/nahueldesimone/Downloads/')
+    getFiles("title = 'HolaDrive.txt'")
